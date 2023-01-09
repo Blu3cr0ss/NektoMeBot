@@ -17,16 +17,13 @@ class DiscordBot: ListenerAdapter() {
 
         val jda = JDABuilder.createLight(args[0], emptyList()).addEventListeners(DiscordBot()).setActivity(Activity.playing("NektoMe")).build()
         jda.updateCommands().addCommands(Commands.slash("ping", "Calculate ping of the bot"))
-
-
-        @Override
-        fun onSlashCommandInteraction(event: SlashCommandInteractionEvent){
-            if (event.name == "ping"){
-                val time = System.currentTimeMillis()
-                event.reply("Pong!").setEphemeral(true) // reply or acknowledge
-                    .flatMap { v -> event.hook.editOriginalFormat("Pong: %d ms", System.currentTimeMillis() - time)}
-                    .queue()
-            }
+    }
+    override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent){
+        if (event.name == "ping"){
+            val time = System.currentTimeMillis()
+            event.reply("Pong!").setEphemeral(true) // reply or acknowledge
+                .flatMap { _ -> event.hook.editOriginalFormat("Pong: %d ms", System.currentTimeMillis() - time)}
+                .queue()
         }
     }
 }
