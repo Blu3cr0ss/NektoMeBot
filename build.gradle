@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.0'
+    id 'application'
+}
+
+group 'bot.nektome'
+version '1.0-SNAPSHOT'
+application.mainClass = 'bot.nektome.nektobot.Main'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'io.socket:socket.io-client:1.0.1'
+    implementation 'log4j:log4j:1.2.17'
+}
