@@ -1,6 +1,6 @@
 package bot.nektome.nektobot.socketio
 
-import bot.nektome.nektobot.Settings
+import bot.nektome.nektobot.event.*
 import bot.nektome.nektobot.util.logger
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -8,24 +8,30 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONString
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-object Connection {
+class NektoBot(val token: String) {
+    class Settings {
+        var AUTO_READ = true
+        var LOG_UNKNOWN = true
+    }
+
+    var settings = Settings()
     lateinit var socket: Socket
     var dialogId: Long = -1
     var messageCache = hashMapOf<Long, String>()
-    fun start(token: String) {
+    fun start(): NektoBot {
         logger.info("Connecting to https://im.nekto.me ...")
         val options = IO.Options()
 
-//        setOptionsTrustingAllSsls(options)
         val socket = IO.socket(
             "https://im.nekto.me",
             options
         )
         socket.connect()
         logger.info("Connected!")
-        Connection.socket = socket
+        this.socket = socket
 
         val authToken = JSONObject(
             mapOf(
@@ -43,94 +49,96 @@ object Connection {
             val res = JSONObject(JSONString { it[0].toString() }.toJSONString())
             val data = res["data"] as JSONObject
             when (res["notice"]) {
+                "auth.successToken" -> {
+                    logger.info("Successfully logged in!")
+                    Events.LOGIN.trigger()
+                }
+
                 "search.success" -> {
                     logger.warn("Searching chat...")
+                    Events.SEARCH_STARTED.trigger()
                 }
 
                 "dialog.opened" -> {
-                    dialogId = (res["data"] as JSONObject)["id"].toString().toLong()
+                    dialogId = data["id"].toString().toLong()
                     logger.warn("Found chat! DialogID is $dialogId")
-                    sendMsg("привет")
+                    Events.DIALOG_STARTED.trigger(FoundDialogEvent(dialogId, data))
                 }
 
                 "dialog.typing" -> {
-                    if ((res["data"] as JSONObject)["typing"].toString().toBoolean()) {
-                        logger.warn("Stranger started typing!")
+                    if (data["typing"].toString().toBoolean()) {
+                        Events.TYPING.trigger(TypingEvent.Start(data["dialogId"].toString().toLong(), data))
                     } else {
-                        logger.warn("Stranger stopped typing!")
+                        Events.TYPING.trigger(TypingEvent.Stop(data["dialogId"].toString().toLong(), data))
+                    }
+                }
+
+                "dialog.info" -> {
+                    if (shouldRefresh) {
+                        val msgList = (data["messages"] as JSONArray)
+                        for (i in 0 until msgList.length() - 1) {
+                            val current = (msgList[i] as JSONObject)
+                            messageCache[current["id"].toString().toLong()] = current["message"].toString()
+                        }
+                        shouldRefresh = false
                     }
                 }
 
                 "dialog.closed" -> {
                     logger.info("Dialog closed!")
+                    Events.DIALOG_ENDED.trigger(DialogClosedEvent(dialogId, data))
                 }
 
                 "messages.new" -> {
                     val msg = data["message"].toString()
-                    logger.info(msg)
+                    messageCache[data["id"].toString().toLong()] = msg
                     // auto read message
-                    socket.emit(
-                        "action", JSONObject(
-                            mapOf(
-                                "action" to "anon.readMessages",
-                                "dialogId" to dialogId,
-                                "lastMessageId" to data["id"].toString().toLong()
+                    if (settings.AUTO_READ) {
+                        socket.emit(
+                            "action", JSONObject(
+                                mapOf(
+                                    "action" to "anon.readMessages",
+                                    "dialogId" to dialogId,
+                                    "lastMessageId" to data["id"].toString().toLong()
+                                )
                             )
                         )
-                    )
-
-                    if (msg.startsWith(
-                            "."
-                        ) && data["senderId"].toString().toInt() == 32306740    //mine id
-                    ) when (msg.removePrefix(".")) {
-                        "disconnect" -> {
-                            leaveChat()
-                        }
-
-                        "info" -> {
-                            refreshMsgCache()
-                        }
-
-                        else -> {
-                            logger.error("Command not found")
-                        }
                     }
-                }
-
-                "auth.successToken" -> {
-                    logger.info("Successfully logged in!")
+                    Events.MESSAGE_RECEIVED.trigger(MessageReceivedEvent(msg, data))
                 }
 
                 "error.code" -> {
-                    logger.error(data["id"].toString() + ": " + data["description"].toString())
+                    Events.ERROR.trigger(
+                        ServerReturnedErrorEvent(
+                            data["id"].toString().toInt(),
+                            data["description"].toString(), data
+                        )
+                    )
                 }
 
                 "search.out" -> {
                     logger.info("Exited search!")
                 }
 
-                "online.count" -> {
-                    logger.info("We on track!")
-                }
-
-                "dialog.info" -> {
-                    val msgList = (data["messages"] as JSONArray)
-                    for (i in 0 until msgList.length() - 1) {
-                        val current = (msgList[i] as JSONObject)
-                        messageCache[current["id"].toString().toLong()] = current["message"].toString()
-                    }
-                }
-
                 "messages.reads" -> {
                     val msgs = (data["reads"] as JSONArray)
-                    logger.info("Stranger have read following msgs: " + msgs)
+                    Events.MESSAGES_READ.trigger(MessagesReadEvent(msgs.convertJSONArrayToSimpleArray(), data))
                 }
 
                 else -> {
-                    logger.warn(res.toString(2))
+                    if (settings.LOG_UNKNOWN) logger.warn(res.toString(2))
                 }
             }
         }
+        return this
+    }
+
+    private fun JSONArray.convertJSONArrayToSimpleArray(): Array<Long> {
+        val arr = arrayListOf<Long>()
+        for (i in 0 until this.length()) {
+            arr.add(this[i].toString().toLong())
+        }
+        return arr.toTypedArray()
     }
 
     fun track() {
@@ -142,7 +150,6 @@ object Connection {
                 )
             )
         )
-        logger.warn("Im online now!")
     }
 
     fun sendMsg(msg: String) {
@@ -167,7 +174,6 @@ object Connection {
                 )
             )
         )
-        logger.warn("Im offline now!")
     }
 
     fun startSearch(mySex: String, wishSex: String, myAge: Array<Int>, wishAge: Array<Array<Int>>) {
@@ -207,6 +213,20 @@ object Connection {
                 "myAge" to myAge,
                 "mySex" to mySex,
                 "wishAge" to wishAge
+            )
+        )
+        socket.emit(
+            "action", req
+        )
+    }
+
+    fun startSearch(mySex: String, myAge: Array<Int>, wishAge: Array<Int>) {
+        val req = JSONObject(
+            mapOf(
+                "action" to "search.run",
+                "myAge" to myAge,
+                "mySex" to mySex,
+                "wishAge" to arrayOf(wishAge)
             )
         )
         socket.emit(
@@ -260,6 +280,29 @@ object Connection {
                 )
             )
         )
+    }
+
+    var shouldRefresh = false
+    fun refreshMessagesCache() {
+        shouldRefresh = true
+        socket.emit(
+            "action", JSONObject(
+                mapOf(
+                    "action" to "dialog.info",
+                    "dialogId" to dialogId
+                )
+            )
+        )
+    }
+
+    fun getMessageById(id: Long): String? {
+        return messageCache[id]
+    }
+
+    fun getIdByMessage(msg: String): Long {
+        return messageCache.entries.first {
+            (it.value == msg)
+        }.key
     }
 
 }
