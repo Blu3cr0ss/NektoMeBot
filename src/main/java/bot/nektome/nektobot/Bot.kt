@@ -9,7 +9,7 @@ import bot.nektome.nektobot.util.logger
 object Bot {
     fun start() {   //little example
         val bot =
-            NektoBot("146838d71244b62ff0c804ea346ea5a4c6f37e81af7e652b5f87ec41dc46c4e7").start()  //create & start bot
+            NektoBot("146838d71244b62ff0c804ea346ea5a4c6f37e81af7e652b5f87ec41dc46c4e7").start() //create & start bot
         bot.startSearch(    //search for chat
             Settings.Sex.MALE,
             Settings.Ages.UNDER17,

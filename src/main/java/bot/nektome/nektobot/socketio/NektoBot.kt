@@ -8,7 +8,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONString
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class NektoBot(val token: String) {
@@ -21,6 +20,7 @@ class NektoBot(val token: String) {
     lateinit var socket: Socket
     var dialogId: Long = -1
     var messageCache = hashMapOf<Long, String>()
+    var onlineCount = 0
     fun start(): NektoBot {
         logger.info("Connecting to https://im.nekto.me ...")
         val options = IO.Options()
@@ -123,6 +123,11 @@ class NektoBot(val token: String) {
                 "messages.reads" -> {
                     val msgs = (data["reads"] as JSONArray)
                     Events.MESSAGES_READ.trigger(MessagesReadEvent(msgs.convertJSONArrayToSimpleArray(), data))
+                }
+
+                "online.count" -> {
+                    onlineCount = (data["inChats"].toString().toInt())
+                    logger.info("Online is: $onlineCount")
                 }
 
                 else -> {

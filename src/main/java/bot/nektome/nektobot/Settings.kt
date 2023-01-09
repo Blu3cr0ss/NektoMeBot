@@ -1,6 +1,10 @@
 package bot.nektome.nektobot
 
 object Settings {
+
+    val botToken: String
+        get() = "OTk2ODM0MTA4OTA5MDQzNzkz.GXeVX_.1UPBnxYin-Y8LiZgwFH7RZ5wMMzuKnUcHgH3p0"
+
     object Sex {
         val MALE = ("M")
         val FEMALE = ("F")
