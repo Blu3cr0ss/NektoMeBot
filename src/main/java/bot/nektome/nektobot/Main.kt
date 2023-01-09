@@ -1,16 +1,15 @@
 package bot.nektome.nektobot
 
-import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.entities.Activity
 import org.apache.log4j.BasicConfigurator
 import java.net.URL
+import kotlin.concurrent.thread
 
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
+        thread { Thread.currentThread().join() }
         BasicConfigurator.configure()   //log4j
         //Bot.start()
-        DiscordBot().main(arrayOf(Settings.botToken))
+        DiscordBot().start(Settings.botToken)
     }
 }

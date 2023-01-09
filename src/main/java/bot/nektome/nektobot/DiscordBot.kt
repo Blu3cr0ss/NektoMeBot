@@ -1,37 +1,23 @@
 package bot.nektome.nektobot
 
 import bot.nektome.nektobot.util.logger
-import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.entities.Activity
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.interactions.commands.build.Commands
-import kotlin.system.exitProcess
+import discord4j.core.DiscordClient
+import discord4j.core.event.domain.lifecycle.ReadyEvent
+import discord4j.core.event.domain.message.MessageCreateEvent
+import discord4j.core.spec.MessageCreateSpec
 
-class DiscordBot: ListenerAdapter() {
-    fun main(args: Array<String>){
-        if (args.isEmpty()) {
-            logger.info("You have to provide a token as first argument!");
-            exitProcess(1);
+class DiscordBot {
+    fun start(token: String) {
+        val client = DiscordClient.create(token);
+        val gateway = client.login().block();
+        gateway.on(ReadyEvent::class.java).subscribe {
+            logger.info("Logged in as " + it.self.username + "#" + it.self.discriminator)
         }
-
-        val jda = JDABuilder.createLight(args[0], emptyList()).addEventListeners(DiscordBot()).setActivity(Activity.playing("NektoMe")).build()
-        jda.awaitReady()
-        jda.updateCommands().addCommands(Commands.slash("ping", "Calculate ping of the bot"))
-    }
-    override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent){
-        if (event.name == "ping"){
-            val time = System.currentTimeMillis()
-            event.reply("Pong!").setEphemeral(true) // reply or acknowledge
-                .flatMap { _ -> event.hook.editOriginalFormat("Pong: %d ms", System.currentTimeMillis() - time)}
-                .queue()
+        gateway.on(MessageCreateEvent::class.java).subscribe {
+            if (it.message.content == ".ping") {
+                val ping = System.currentTimeMillis() - it.message.timestamp.toEpochMilli()
+                logger.info(ping)
+            }
         }
-    }
-
-    override fun onMessageReceived(event: MessageReceivedEvent) {
-        var author = event.author
-        var message = event.message
-        System.out.println("$author sent $message")
     }
 }

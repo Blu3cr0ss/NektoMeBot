@@ -20,5 +20,5 @@ dependencies {
     implementation 'io.socket:socket.io-client:1.0.1'
     implementation 'log4j:log4j:1.2.17'
     implementation 'com.github.Fylipp:easy-events:1.1.0'
-    implementation 'com.github.DV8FromTheWorld:JDA:v5.0.0-beta.2'
+    implementation 'com.discord4j:discord4j-core:3.2.3'
 }
