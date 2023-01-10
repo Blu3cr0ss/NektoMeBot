@@ -1,7 +1,7 @@
 package bot.nektome.nektobot
 
+import bot.nektome.nektobot.discord.DiscordBot
 import org.apache.log4j.BasicConfigurator
-import java.net.URL
 import kotlin.concurrent.thread
 
 object Main {
@@ -10,6 +10,6 @@ object Main {
         thread { Thread.currentThread().join() }
         BasicConfigurator.configure()   //log4j
         //Bot.start()
-        DiscordBot().start(Settings.botToken)
+        DiscordBot.start()
     }
 }
