@@ -1,5 +1,6 @@
 package bot.nektome.nektobot.discord.commands
 
+import bot.nektome.nektobot.Settings
 import discord4j.common.util.Snowflake
 import discord4j.core.`object`.command.ApplicationCommandOption
 import discord4j.discordjson.json.ApplicationCommandOptionData
@@ -30,6 +31,7 @@ object DeleteLastRoomCommand : AbstractCommand() {
                 ev.interaction.guild.block().getChannelById(Snowflake.of(it)).block().delete().block()
                 CreateRoomCommand.rooms--
             }
+            Settings.inChannel = null
             return@create cb.content("Deleted " + count + " rooms")
         }
     }

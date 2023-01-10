@@ -3,10 +3,7 @@ package bot.nektome.nektobot.discord
 import bot.nektome.nektobot.Settings
 import bot.nektome.nektobot.discord.commands.*
 import bot.nektome.nektobot.socketio.NektoBot
-import bot.nektome.nektobot.util.logger
 import discord4j.core.DiscordClient
-import discord4j.core.event.domain.lifecycle.ReadyEvent
-import discord4j.core.event.domain.message.MessageCreateEvent
 
 object DiscordBot {
     val client = DiscordClient.create(Settings.botToken);
@@ -28,6 +25,11 @@ object DiscordBot {
     }
 
     fun setupNektoBot() {
-
+        nektobot.events.DIALOG_STARTED.addListener {
+            Settings.inChannel?.createMessage("Chat found! ${it.dialogId}")?.block()
+        }
+        nektobot.events.MESSAGE_RECEIVED.addListener {
+            Settings.inChannel?.createMessage("Strangers sent: ${it.data}")?.block()
+        }
     }
 }

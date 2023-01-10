@@ -1,5 +1,6 @@
 package bot.nektome.nektobot.discord.commands
 
+import bot.nektome.nektobot.Settings
 import bot.nektome.nektobot.discord.DiscordBot
 import bot.nektome.nektobot.util.logger
 import discord4j.common.util.Snowflake
@@ -84,6 +85,7 @@ object CreateRoomCommand : AbstractCommand() {
                     ).block()
                 rooms++;
                 createdRoomsIDs.add(room.id.asLong())
+                Settings.inChannel = room
                 room.createMessage("Hello! This is room created by NektoMeBot. Type '/help' to get tutorial how to start chatting")
                     .block()
 

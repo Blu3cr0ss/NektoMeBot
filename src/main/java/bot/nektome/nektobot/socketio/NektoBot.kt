@@ -2,6 +2,7 @@ package bot.nektome.nektobot.socketio
 
 import bot.nektome.nektobot.event.*
 import bot.nektome.nektobot.util.logger
+import com.pploder.events.SimpleEvent
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONArray
@@ -14,6 +15,19 @@ class NektoBot(val token: String) {
     class Settings {
         var AUTO_READ = true
         var LOG_UNKNOWN = true
+    }
+
+    val events = Events
+
+    object Events {
+        val LOGIN = SimpleEvent<LoginedEvent>()
+        val DIALOG_STARTED = SimpleEvent<FoundDialogEvent>()
+        val TYPING = SimpleEvent<TypingEvent>()
+        val SEARCH_STARTED = SimpleEvent<StartSearchForDialogEvent>()
+        val DIALOG_ENDED = SimpleEvent<DialogClosedEvent>()
+        val ERROR = SimpleEvent<ServerReturnedErrorEvent>()
+        val MESSAGES_READ = SimpleEvent<MessagesReadEvent>()
+        val MESSAGE_RECEIVED = SimpleEvent<MessageReceivedEvent>()
     }
 
     var settings = Settings()

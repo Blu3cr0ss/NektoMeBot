@@ -1,14 +1,9 @@
 package bot.nektome.nektobot.discord.commands
 
-import bot.nektome.nektobot.Settings
 import bot.nektome.nektobot.discord.DiscordBot
 import bot.nektome.nektobot.util.logger
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent
-import discord4j.core.`object`.command.ApplicationCommandInteraction
-import discord4j.core.`object`.entity.Message
 import discord4j.core.spec.InteractionApplicationCommandCallbackSpec
-import discord4j.core.spec.MessageCreateSpec
-import discord4j.discordjson.json.ApplicationCommandRequest
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest
 
 abstract class AbstractCommand {
@@ -44,7 +39,6 @@ abstract class AbstractCommand {
 
         DiscordBot.gateway.on(ApplicationCommandInteractionEvent::class.java).subscribe {
             if (it.commandName == cmd.name()) {
-                Settings.lastChannel = it.interaction.channel
                 it.reply(lambda.invoke(cmd, it, InteractionApplicationCommandCallbackSpec.builder()).build()).block()
             }
         }
