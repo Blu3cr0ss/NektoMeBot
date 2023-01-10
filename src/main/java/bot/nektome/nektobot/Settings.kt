@@ -16,4 +16,11 @@ object Settings {
         val `26-35` = (arrayOf(26, 35))
         val OVER36 = (arrayOf(36, 36))
     }
+
+
+
+    object SearchParameters{
+        var mySex: String? = null
+        var wishSex: String? = null
+    }
 }

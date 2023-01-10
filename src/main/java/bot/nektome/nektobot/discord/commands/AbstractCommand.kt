@@ -22,6 +22,7 @@ abstract class AbstractCommand {
 
     init {
         listCommands.add(this)
+        logger.info("Added command ${this.javaClass.name}")
         make()
         DiscordBot.gateway.restClient.applicationService
             .createGuildApplicationCommand(

@@ -2,25 +2,14 @@ package bot.nektome.nektobot.discord.commands
 
 import bot.nektome.nektobot.discord.DiscordBot
 import bot.nektome.nektobot.util.logger
-import discord4j.common.store.action.read.GetRoleByIdAction
 import discord4j.common.util.Snowflake
-import discord4j.core.event.domain.interaction.ButtonInteractionEvent
-import discord4j.core.`object`.ExtendedPermissionOverwrite
 import discord4j.core.`object`.PermissionOverwrite
 import discord4j.core.`object`.command.ApplicationCommandOption
-import discord4j.core.`object`.entity.Role
-import discord4j.core.`object`.entity.User
 import discord4j.core.spec.TextChannelCreateSpec
-import discord4j.discordjson.json.ApplicationCommandData
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest
-import discord4j.discordjson.json.PermissionsEditRequest
-import discord4j.discordjson.json.RoleData
-import discord4j.discordjson.json.UserData
 import discord4j.rest.util.Permission
 import discord4j.rest.util.PermissionSet
-import reactor.core.publisher.Flux
-import javax.management.relation.RoleList
 
 object CreateRoomCommand : AbstractCommand() {
     var rooms = 0
@@ -74,7 +63,7 @@ object CreateRoomCommand : AbstractCommand() {
                 }
 
 
-                val name = "nektome_room_" + rooms + "_" +
+                val name = "nekto-me-room-" + rooms + "_" +
                         (1..5).map { (('a'..'z') + ('A'..'Z') + ('0'..'9')).random() }
                             .joinToString("")
                 val room = DiscordBot.gateway.getGuildById(ev.interaction.guild.block().id).block()

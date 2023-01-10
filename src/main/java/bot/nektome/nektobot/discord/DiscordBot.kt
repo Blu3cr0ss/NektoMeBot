@@ -1,9 +1,7 @@
 package bot.nektome.nektobot.discord
 
 import bot.nektome.nektobot.Settings
-import bot.nektome.nektobot.discord.commands.CreateRoomCommand
-import bot.nektome.nektobot.discord.commands.DeleteLastRoomCommand
-import bot.nektome.nektobot.discord.commands.PingCommand
+import bot.nektome.nektobot.discord.commands.*
 import bot.nektome.nektobot.socketio.NektoBot
 import bot.nektome.nektobot.util.logger
 import discord4j.core.DiscordClient
@@ -21,6 +19,8 @@ object DiscordBot {
         PingCommand
         CreateRoomCommand
         DeleteLastRoomCommand
+        SetMySexCommand
+        SetWishSexCommand
     }
 
     fun setupNektoBot() {
