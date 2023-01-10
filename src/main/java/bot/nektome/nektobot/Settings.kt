@@ -1,8 +1,12 @@
 package bot.nektome.nektobot
 
+import discord4j.core.`object`.entity.channel.MessageChannel
+import reactor.core.publisher.Mono
+
 object Settings {
 
     val botToken = "OTI2NjQ0NzgzNjA1MjQ4MDUy.GK_zDq.n0qxFZ0W3_BTt195miUx9uJB4PmDMcoL9Lc-Rk"
+    var lastChannel: Mono<MessageChannel>? = null
 
     object Sex {
         val MALE = ("M")
@@ -20,9 +24,9 @@ object Settings {
 
 
     object SearchParameters{
-        var mySex: String? = null
+        var mySex: String? = Sex.MALE
         var wishSex: String? = null
-        var myAge: Array<Int> = Settings.Ages.UNDER17
-        var wishAge: Array<Array<Int>> = arrayOf(Settings.Ages.UNDER17)
+        var myAge: Array<Int> = Ages.UNDER17
+        var wishAge: Array<Array<Int>> = arrayOf(Ages.UNDER17)
     }
 }

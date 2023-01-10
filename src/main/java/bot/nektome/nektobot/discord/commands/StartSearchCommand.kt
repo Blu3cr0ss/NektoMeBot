@@ -1,10 +1,10 @@
 package bot.nektome.nektobot.discord.commands
 
-import bot.nektome.nektobot.Settings
-import bot.nektome.nektobot.discord.DiscordBot
-import bot.nektome.nektobot.socketio.NektoBot
-import discord4j.core.`object`.command.ApplicationCommandOption
-import discord4j.discordjson.json.ApplicationCommandOptionData
+import bot.nektome.nektobot.Settings.SearchParameters.wishAge
+import bot.nektome.nektobot.Settings.SearchParameters.wishSex
+import bot.nektome.nektobot.Settings.SearchParameters.myAge
+import bot.nektome.nektobot.Settings.SearchParameters.mySex
+import bot.nektome.nektobot.discord.DiscordBot.nektobot
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest
 
 object StartSearchCommand: AbstractCommand() {
@@ -15,7 +15,16 @@ object StartSearchCommand: AbstractCommand() {
                 .description("Start search a chat-mate")
                 .build()
         ) { cmd, ev, cb ->
-            return@create cb.content("Bebra")
+
+            if (!mySex.isNullOrEmpty() && !wishSex.isNullOrEmpty()){
+                nektobot.startSearch(mySex!!, wishSex!!, myAge, wishAge)
+            } else if (!mySex.isNullOrEmpty() && wishSex.isNullOrEmpty()){
+                nektobot.startSearch(mySex!!, myAge, wishAge)
+            } else {
+                return@create cb.content("Problem with search arguments")
+            }
+
+            return@create cb.content("Searching for chat-mate...")
         }
     }
 }
