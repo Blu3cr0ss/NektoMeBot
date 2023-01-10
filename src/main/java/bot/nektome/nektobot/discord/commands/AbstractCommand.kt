@@ -1,5 +1,6 @@
 package bot.nektome.nektobot.discord.commands
 
+import bot.nektome.nektobot.Settings
 import bot.nektome.nektobot.discord.DiscordBot
 import bot.nektome.nektobot.util.logger
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent
@@ -39,6 +40,7 @@ abstract class AbstractCommand {
 
         DiscordBot.gateway.on(ApplicationCommandInteractionEvent::class.java).subscribe {
             if (it.commandName == cmd.name()) {
+                Settings.inChannel = it.interaction.channel.block()
                 it.reply(lambda.invoke(cmd, it, InteractionApplicationCommandCallbackSpec.builder()).build()).block()
             }
         }

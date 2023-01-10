@@ -85,7 +85,7 @@ object CreateRoomCommand : AbstractCommand() {
                     ).block()
                 rooms++;
                 createdRoomsIDs.add(room.id.asLong())
-                Settings.inChannel = room
+                //Settings.inChannel = room
                 room.createMessage("Hello! This is room created by NektoMeBot. Type '/help' to get tutorial how to start chatting")
                     .block()
 

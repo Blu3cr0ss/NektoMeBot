@@ -106,6 +106,7 @@ class NektoBot(val token: String) {
                 "messages.new" -> {
                     val msg = data["message"].toString()
                     messageCache[data["id"].toString().toLong()] = msg
+
                     // auto read message
                     if (settings.AUTO_READ) {
                         socket.emit(
@@ -118,7 +119,7 @@ class NektoBot(val token: String) {
                             )
                         )
                     }
-                    Events.MESSAGE_RECEIVED.trigger(MessageReceivedEvent(msg, data))
+                    Events.MESSAGE_RECEIVED.trigger(MessageReceivedEvent(msg, data, data["randomId"].toString()))
                 }
 
                 "error.code" -> {
@@ -172,13 +173,15 @@ class NektoBot(val token: String) {
     }
 
     fun sendMsg(msg: String) {
+        val tmp = UUID.randomUUID()
+        bot.nektome.nektobot.Settings.lastMyMessage = tmp.toString()
         socket.emit(
             "action", JSONObject(
                 mapOf(
                     "action" to "anon.message",
                     "dialogId" to dialogId,
                     "message" to msg,
-                    "randomId" to UUID.randomUUID().toString()
+                    "randomId" to tmp
                 )
             )
         )

@@ -22,14 +22,22 @@ object DiscordBot {
         SetWishAgeCommand
         ShowPreferencesCommand
         StartSearchCommand
+        HelpCommand
+        SendCommand
+        LeaveCommand
     }
 
     fun setupNektoBot() {
         nektobot.events.DIALOG_STARTED.addListener {
+            Settings.isDialogOpened = true
             Settings.inChannel?.createMessage("Chat found! ${it.dialogId}")?.block()
         }
         nektobot.events.MESSAGE_RECEIVED.addListener {
-            Settings.inChannel?.createMessage("Strangers sent: ${it.data}")?.block()
+            if (it.uuid != Settings.lastMyMessage) Settings.inChannel?.createMessage("Strangers sent: ${it.data["message"]}")?.block()
+        }
+        nektobot.events.DIALOG_ENDED.addListener {
+            Settings.isDialogOpened = false
+            Settings.inChannel?.createMessage("Chat ${it.dialogId} ended.")?.block()
         }
     }
 }

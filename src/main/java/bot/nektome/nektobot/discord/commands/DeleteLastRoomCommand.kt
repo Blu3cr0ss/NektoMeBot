@@ -31,7 +31,7 @@ object DeleteLastRoomCommand : AbstractCommand() {
                 ev.interaction.guild.block().getChannelById(Snowflake.of(it)).block().delete().block()
                 CreateRoomCommand.rooms--
             }
-            Settings.inChannel = null
+            //Settings.inChannel = null
             return@create cb.content("Deleted " + count + " rooms")
         }
     }
