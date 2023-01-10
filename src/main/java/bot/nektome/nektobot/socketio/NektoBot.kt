@@ -211,7 +211,7 @@ class NektoBot(val token: String) {
         )
     }
 
-    fun startSearch(mySex: String, myAge: Array<Int>, wishAge: Array<Array<Int>>) {
+    public fun startSearch(mySex: String, myAge: Array<Int>, wishAge: Array<Array<Int>>) {
         val req = JSONObject(
             mapOf(
                 "action" to "search.run",

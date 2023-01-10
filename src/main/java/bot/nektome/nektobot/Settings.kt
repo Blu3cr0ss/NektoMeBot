@@ -22,5 +22,7 @@ object Settings {
     object SearchParameters{
         var mySex: String? = null
         var wishSex: String? = null
+        var myAge: Array<Int> = Settings.Ages.UNDER17
+        var wishAge: Array<Array<Int>> = arrayOf(Settings.Ages.UNDER17)
     }
 }

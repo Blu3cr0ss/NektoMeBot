@@ -21,6 +21,10 @@ object DiscordBot {
         DeleteLastRoomCommand
         SetMySexCommand
         SetWishSexCommand
+        SetMyAgeCommand
+        SetWishAgeCommand
+        ShowPreferencesCommand
+        StartSearchCommand
     }
 
     fun setupNektoBot() {
