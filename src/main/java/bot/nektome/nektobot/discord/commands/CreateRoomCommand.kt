@@ -49,7 +49,11 @@ object CreateRoomCommand : AbstractCommand() {
                     membersPerms = users?.map {
                         PermissionOverwrite.forMember(
                             it.id,
-                            PermissionSet.of(Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES),
+                            PermissionSet.of(
+                                Permission.VIEW_CHANNEL,
+                                Permission.SEND_MESSAGES,
+                                Permission.READ_MESSAGE_HISTORY
+                            ),
                             PermissionSet.none()
                         )
                     }
