@@ -36,6 +36,7 @@ object DiscordBot {
         HelpCommand
         SendCommand
         LeaveCommand
+        StopSearchCommand
     }
 
     val typingCoroutineThread = newSingleThreadContext("TypingThread")
