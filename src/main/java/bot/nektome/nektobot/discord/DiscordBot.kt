@@ -3,11 +3,8 @@ package bot.nektome.nektobot.discord
 import bot.nektome.nektobot.Settings
 import bot.nektome.nektobot.discord.commands.*
 import bot.nektome.nektobot.socketio.NektoBot
-import bot.nektome.nektobot.util.logger
-import bot.nektome.nektobot.util.toTypedArray
 import discord4j.core.DiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
-import discord4j.discordjson.json.ApplicationCommandData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -37,6 +34,7 @@ object DiscordBot {
         SendCommand
         LeaveCommand
         StopSearchCommand
+        ChangePrefixCommand
     }
 
     val typingCoroutineThread = newSingleThreadContext("TypingThread")
@@ -51,6 +49,7 @@ object DiscordBot {
                 delay(secsToStop)
             }
         }
+
         nektobot.events.DIALOG_STARTED.addListener {
             inChannel?.createMessage("Chat found! ${it.dialogId}")?.block()
             GlobalScope.launch(context = typingCoroutineThread) {
