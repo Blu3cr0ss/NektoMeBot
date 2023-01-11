@@ -1,6 +1,5 @@
 package bot.nektome.nektobot.discord.commands
 
-import bot.nektome.nektobot.Settings
 import bot.nektome.nektobot.discord.DiscordBot
 import bot.nektome.nektobot.util.logger
 import discord4j.common.util.Snowflake
@@ -15,7 +14,7 @@ import discord4j.rest.util.PermissionSet
 object CreateRoomCommand : AbstractCommand() {
     var rooms = 0
     val createdRoomsIDs = arrayListOf<Long>()
-    
+
     override fun make() {
         create(
             ImmutableApplicationCommandRequest.builder()
@@ -58,7 +57,11 @@ object CreateRoomCommand : AbstractCommand() {
                     membersPerms = listOf(
                         PermissionOverwrite.forRole(
                             ev.interaction.guild.block().id,
-                            PermissionSet.of(Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES),
+                            PermissionSet.of(
+                                Permission.VIEW_CHANNEL,
+                                Permission.SEND_MESSAGES,
+                                Permission.READ_MESSAGE_HISTORY
+                            ),
                             PermissionSet.none()
                         )
                     )
