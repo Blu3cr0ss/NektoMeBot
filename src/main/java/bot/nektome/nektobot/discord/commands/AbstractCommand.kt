@@ -40,7 +40,7 @@ abstract class AbstractCommand {
 
         DiscordBot.gateway.on(ApplicationCommandInteractionEvent::class.java).subscribe {
             if (it.commandName == cmd.name()) {
-                Settings.inChannel = it.interaction.channel.block()
+                DiscordBot.inChannel = it.interaction.channel.block()
                 it.reply(lambda.invoke(cmd, it, InteractionApplicationCommandCallbackSpec.builder()).build()).block()
             }
         }

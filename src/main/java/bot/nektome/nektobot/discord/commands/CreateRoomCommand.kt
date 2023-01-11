@@ -44,6 +44,7 @@ object CreateRoomCommand : AbstractCommand() {
                                 .block()
                         }
 
+
                 val membersPerms: List<PermissionOverwrite>?
                 if (users != null) {
                     membersPerms = users?.map {

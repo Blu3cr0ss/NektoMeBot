@@ -18,6 +18,8 @@ class NektoBot(val token: String) {
     }
 
     val events = Events
+    var isInDialog = false
+    var lastMessageUUID = ""
 
     object Events {
         val LOGIN = SimpleEvent<LoginedEvent>()
@@ -76,6 +78,7 @@ class NektoBot(val token: String) {
                 "dialog.opened" -> {
                     dialogId = data["id"].toString().toLong()
                     logger.warn("Found chat! DialogID is $dialogId")
+                    isInDialog = true
                     Events.DIALOG_STARTED.trigger(FoundDialogEvent(dialogId, data))
                 }
 
@@ -100,7 +103,9 @@ class NektoBot(val token: String) {
 
                 "dialog.closed" -> {
                     logger.info("Dialog closed!")
+                    isInDialog = false
                     Events.DIALOG_ENDED.trigger(DialogClosedEvent(dialogId, data))
+                    dialogId = -1
                 }
 
                 "messages.new" -> {
@@ -174,7 +179,7 @@ class NektoBot(val token: String) {
 
     fun sendMsg(msg: String) {
         val tmp = UUID.randomUUID()
-        bot.nektome.nektobot.Settings.lastMyMessage = tmp.toString()
+        lastMessageUUID = tmp.toString()
         socket.emit(
             "action", JSONObject(
                 mapOf(
@@ -280,7 +285,6 @@ class NektoBot(val token: String) {
                 )
             )
         )
-        dialogId = -1
     }
 
     fun stopSearch() {

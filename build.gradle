@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 group 'bot.nektome'
@@ -16,10 +17,20 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation 'io.socket:socket.io-client:1.0.1'
-    implementation 'log4j:log4j:1.2.17'
-    implementation 'com.github.Fylipp:easy-events:1.1.0'
-    implementation 'com.discord4j:discord4j-core:3.2.3'
-    implementation 'com.github.johnrengelman:shadow:7.1.0'
+    shadow "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    shadow 'io.socket:socket.io-client:1.0.1'
+    shadow 'log4j:log4j:1.2.17'
+    shadow 'com.github.Fylipp:easy-events:1.1.0'
+    shadow 'com.discord4j:discord4j-core:3.2.3'
+    shadow "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+
+    implementation configurations.shadow
+}
+
+
+jar.enabled = false
+
+shadowJar {
+    classifier ''
+    configurations = [project.configurations.shadow]
 }
