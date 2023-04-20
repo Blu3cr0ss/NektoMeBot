@@ -4,6 +4,7 @@ import bot.nektome.nektobot.Settings
 import bot.nektome.nektobot.discord.DiscordBot
 import bot.nektome.nektobot.util.logger
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent
+import discord4j.core.`object`.entity.Member
 import discord4j.core.spec.InteractionApplicationCommandCallbackSpec
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest
 
@@ -15,7 +16,7 @@ abstract class AbstractCommand {
 
     lateinit var cmd: ImmutableApplicationCommandRequest
     lateinit var lambda: (ImmutableApplicationCommandRequest, ApplicationCommandInteractionEvent, InteractionApplicationCommandCallbackSpec.Builder) -> InteractionApplicationCommandCallbackSpec.Builder
-
+    var helpMessage = ""
 
     init {
         listCommands.add(this)

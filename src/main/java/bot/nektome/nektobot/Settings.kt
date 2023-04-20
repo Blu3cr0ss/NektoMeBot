@@ -3,6 +3,7 @@ package bot.nektome.nektobot
 object Settings {
 
     val botToken = "OTI2NjQ0NzgzNjA1MjQ4MDUy.GK_zDq.n0qxFZ0W3_BTt195miUx9uJB4PmDMcoL9Lc-Rk"
+
     var sendPrefix: String = ">"
 
 

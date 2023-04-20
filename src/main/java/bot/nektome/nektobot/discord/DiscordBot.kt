@@ -2,13 +2,16 @@ package bot.nektome.nektobot.discord
 
 import bot.nektome.nektobot.Settings
 import bot.nektome.nektobot.discord.commands.*
+import bot.nektome.nektobot.event.TypingEvent
 import bot.nektome.nektobot.socketio.NektoBot
+import bot.nektome.nektobot.util.logger
 import discord4j.core.DiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
+import reactor.core.publisher.Mono
 import kotlin.random.Random
 
 
@@ -17,6 +20,7 @@ object DiscordBot {
     val gateway = client.login().block()!!;
     val myGuild = 972570408844947466
     val nektobot = NektoBot("146838d71244b62ff0c804ea346ea5a4c6f37e81af7e652b5f87ec41dc46c4e7").start()
+
     var inChannel: MessageChannel? = null
     fun start() {
         setupNektoBot()
@@ -35,6 +39,13 @@ object DiscordBot {
         LeaveCommand
         StopSearchCommand
         ChangePrefixCommand
+    }
+
+    fun makeDiscordBotTyping(shouldType: Boolean) {
+        var isTyping = shouldType
+        inChannel?.typeUntil(
+            Mono.fromRunnable<Void> { isTyping = false }
+        )?.subscribe()
     }
 
     val typingCoroutineThread = newSingleThreadContext("TypingThread")
@@ -62,6 +73,14 @@ object DiscordBot {
         }
         nektobot.events.DIALOG_ENDED.addListener {
             inChannel?.createMessage("Chat ended.")?.block()
+        }
+        nektobot.events.TYPING.addListener {
+            if (it is TypingEvent.Start) {
+                makeDiscordBotTyping(true)
+            } else {
+                makeDiscordBotTyping(false)
+                logger.info("Stop typing")
+            }
         }
     }
 }

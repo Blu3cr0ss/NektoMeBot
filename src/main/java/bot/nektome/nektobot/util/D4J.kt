@@ -1,8 +1,6 @@
 package bot.nektome.nektobot.util
 
 import bot.nektome.nektobot.discord.DiscordBot
-import discord4j.core.event.domain.Event
-import discord4j.core.event.domain.interaction.ButtonInteractionEvent
 
 object D4J {
     fun deleteCommand(name: String) {
@@ -22,7 +20,7 @@ object D4J {
         }
     }
 
-    fun delleteCommands(cmds: Array<String>) {
+    fun deleteCommands(cmds: Array<String>) {
         val discordCommands =
             DiscordBot.gateway.restClient.getApplicationService().getGuildApplicationCommands(
                 DiscordBot.gateway.applicationInfo.block().id.asLong(),
