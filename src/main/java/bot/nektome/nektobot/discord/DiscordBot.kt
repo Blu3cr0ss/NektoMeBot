@@ -6,12 +6,18 @@ import bot.nektome.nektobot.event.TypingEvent
 import bot.nektome.nektobot.socketio.NektoBot
 import bot.nektome.nektobot.util.logger
 import discord4j.core.DiscordClient
+import discord4j.core.event.domain.channel.TypingStartEvent
+import discord4j.core.`object`.entity.User
 import discord4j.core.`object`.entity.channel.MessageChannel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import reactor.core.publisher.Mono
+import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 
@@ -41,31 +47,32 @@ object DiscordBot {
         ChangePrefixCommand
     }
 
-    fun makeDiscordBotTyping(shouldType: Boolean) {
+    fun makeDiscordBotTyping(channel: MessageChannel?, shouldType: Boolean) {
         var isTyping = shouldType
-        inChannel?.typeUntil(
+        channel?.typeUntil(
             Mono.fromRunnable<Void> { isTyping = false }
         )?.subscribe()
     }
 
-    val typingCoroutineThread = newSingleThreadContext("TypingThread")
-    fun setupNektoBot() {
-        suspend fun humanizedTyping() {
-            while (nektobot.isInDialog) {
-                val secsToType = Random.nextLong(1, 5)
-                val secsToStop = Random.nextLong(1, 5)
-                nektobot.setTyping(true)
-                delay(secsToType)
-                nektobot.setTyping(false)
-                delay(secsToStop)
-            }
-        }
+    fun makeNektoTyping(event: TypingStartEvent, channel: MessageChannel?, users: Array<User>? = null) {
+        if (!nektobot.isInDialog) return
+        val channelId = channel?.id?.asLong() ?: return
+        if (event.channelId.asLong() != channelId) return
+        if (users != null && event.userId.asLong() !in users.map { it.id.asLong() }) return
+        if (event.userId.asLong() == client.self.block().id().asLong()) return
 
+        nektobot.setTyping(true)
+
+        val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+        scheduler.schedule({
+            nektobot.setTyping(false)
+            scheduler.shutdown()
+        }, 10, TimeUnit.SECONDS)
+    }
+
+    fun setupNektoBot() {
         nektobot.events.DIALOG_STARTED.addListener {
             inChannel?.createMessage("Chat found! ${it.dialogId}")?.block()
-            GlobalScope.launch(context = typingCoroutineThread) {
-                humanizedTyping()
-            }
         }
         nektobot.events.MESSAGE_RECEIVED.addListener {
             if (it.uuid != nektobot.lastMessageUUID) inChannel?.createMessage("_**==> ${it.data["message"]}**_")
@@ -76,11 +83,13 @@ object DiscordBot {
         }
         nektobot.events.TYPING.addListener {
             if (it is TypingEvent.Start) {
-                makeDiscordBotTyping(true)
+                makeDiscordBotTyping(inChannel, true)
             } else {
-                makeDiscordBotTyping(false)
-                logger.info("Stop typing")
+                makeDiscordBotTyping(inChannel, false)
             }
+        }
+        gateway.on(TypingStartEvent::class.java).subscribe {
+            makeNektoTyping(it, inChannel)
         }
     }
 }

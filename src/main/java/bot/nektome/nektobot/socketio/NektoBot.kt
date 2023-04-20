@@ -298,6 +298,9 @@ class NektoBot(val token: String) {
     }
 
     fun setTyping(typing: Boolean) {
+        if (typing)
+            logger.info("typing")
+        else logger.info("not typing")
         socket.emit(
             "action", JSONObject(
                 mapOf(
